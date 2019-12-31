@@ -19,6 +19,7 @@ import com.intellij.util.messages.MessageBusConnection;
 import org.antlr.works.components.GrammarDocument;
 import org.antlr.works.components.GrammarDocumentFactory;
 import org.antlr.works.components.GrammarWindow;
+import org.antlr.xjlib.appkit.menu.XJMainMenuBar;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -91,6 +92,12 @@ public class PIEditor implements FileEditor {
             return;
         }
         componentDocument.awake();
+
+        // Hide unnecessary menus
+        XJMainMenuBar mainMenuBar = componentDocument.getWindow().getMainMenuBar();
+        mainMenuBar.createMenuBar(XJMainMenuBar.IGNORE_FILEMENU | XJMainMenuBar.IGNORE_HELPMENU | XJMainMenuBar.IGNORE_WINDOWMENU);
+        componentDocument.getWindow().setMainMenuBar(mainMenuBar);
+
         try {
             componentDocument.load(VfsUtil.virtualToIoFile(virtualFile).getPath());
         } catch (Exception e) {
