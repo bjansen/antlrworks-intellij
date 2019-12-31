@@ -4,8 +4,8 @@ import com.intellij.ide.structureView.StructureViewBuilder;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.SyntaxHighlighter;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.antlr.works.utils.IconManager;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -42,32 +42,42 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 public class PIFileType implements FileType {
 
+    @Override
+    @NotNull
     public String getName() {
         return "ANTLR Grammar";
     }
 
+    @Override
+    @NotNull
     public String getDescription() {
         return "ANTLR Grammar File";
     }
 
+    @Override
+    @NotNull
     public String getDefaultExtension() {
         return "g";
     }
 
+    @Override
     public Icon getIcon() {
-        return IconManager.shared().getIconApplication16x16();
+        return IconLoader.getIcon("/icons/antlrGrammar.png");
     }
 
+    @Override
     public boolean isBinary() {
         return false;
     }
 
+    @Override
     public boolean isReadOnly() {
         return false;
     }
 
     // version 8 method
-    public String getCharset(@NotNull VirtualFile virtualFile, byte[] bytes) {
+    @Override
+    public String getCharset(@NotNull VirtualFile virtualFile, @NotNull byte[] bytes) {
         return null;
     }
 
