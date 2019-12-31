@@ -1,20 +1,26 @@
 package org.antlr.works.plugin.intellij;
 
+import com.intellij.ide.plugins.IdeaPluginDescriptor;
+import com.intellij.ide.plugins.PluginManager;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.Anchor;
 import com.intellij.openapi.actionSystem.Constraints;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.components.ApplicationComponent;
+import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import org.antlr.works.IDE;
 import org.antlr.works.dialog.AWPrefsDialog;
-import org.antlr.works.plugin.container.PCXJApplicationDelegate;
+import org.antlr.works.prefs.AWPrefs;
 import org.antlr.works.utils.IconManager;
 import org.antlr.xjlib.appkit.app.XJApplication;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.io.File;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /*
 
@@ -49,14 +55,17 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 public class PIApplicationComponent implements ApplicationComponent, Configurable {
 
+    private final IDE ide;
     private AWPrefsDialog prefsDialog;
 
     public PIApplicationComponent() {
-        IDE._isPlugin = true;
+        this.ide = new IDE();
     }
 
     public void initComponent() {
-        XJApplication.setDelegate(new PCXJApplicationDelegate());
+        setCustomClassPath();
+
+        XJApplication.setDelegate(ide);
         XJApplication.setPropertiesPath(IDE.PROPERTIES_PATH);
 
         PIActionNewFile action = new PIActionNewFile();
@@ -64,6 +73,29 @@ public class PIApplicationComponent implements ApplicationComponent, Configurabl
         DefaultActionGroup group = (DefaultActionGroup) ActionManager.getInstance().getAction("NewGroup");
         group.add(action, new Constraints(Anchor.AFTER, "NewFile"));
     }
+
+    private void setCustomClassPath() {
+        PluginId ourPluginId = PluginManager.getPluginByClassName(getClass().getName());
+        IdeaPluginDescriptor ourPlugin = PluginManager.getPlugin(ourPluginId);
+
+        if (ourPlugin != null) {
+            File libDir = new File(ourPlugin.getPath(), "lib");
+            File[] libs = libDir.listFiles();
+            if (libs != null) {
+                String cp = Arrays.stream(libs)
+                        .map(File::getAbsolutePath)
+                        .filter(path ->
+                                path.contains("antlr-runtime")
+                                        || path.contains("stringtemplate")
+                                        || path.contains("antlr-2")
+                        )
+                        .collect(Collectors.joining(File.pathSeparator));
+                AWPrefs.getPreferences().setBoolean(AWPrefs.PREF_CLASSPATH_CUSTOM, true);
+                AWPrefs.setCustomClassPath(cp);
+            }
+        }
+    }
+
 
     public void disposeComponent() {
     }

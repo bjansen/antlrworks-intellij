@@ -16,11 +16,9 @@ import com.intellij.openapi.vfs.ReadonlyStatusHandler;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.messages.MessageBusConnection;
-import org.antlr.works.components.document.ComponentDocument;
-import org.antlr.works.components.editor.ComponentEditorGrammar;
-import org.antlr.works.plugin.container.PluginContainerDelegate;
-import org.antlr.works.plugin.container.PluginFactory;
-import org.antlr.works.plugin.container.PluginWindow;
+import org.antlr.works.components.GrammarDocument;
+import org.antlr.works.components.GrammarDocumentFactory;
+import org.antlr.works.components.GrammarWindow;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -65,13 +63,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-public class PIEditor implements FileEditor, PluginContainerDelegate {
+public class PIEditor implements FileEditor {
 
-    private PluginWindow window;
+    private GrammarWindow window;
     private Project project;
     private VirtualFile virtualFile;
     private Document document;
-    private ComponentDocument componentDocument;
+    private GrammarDocument componentDocument;
 
     private boolean layout = false;
 
@@ -86,7 +84,7 @@ public class PIEditor implements FileEditor, PluginContainerDelegate {
         this.document = FileDocumentManager.getInstance().getDocument(this.virtualFile);
 
         try {
-            componentDocument = PluginFactory.getInstance().createDocument();
+            componentDocument = (GrammarDocument) new GrammarDocumentFactory(GrammarWindow.class).createDocument();
         } catch (Exception e) {
             System.err.println("Cannot create the document:");
             e.printStackTrace();
@@ -100,8 +98,7 @@ public class PIEditor implements FileEditor, PluginContainerDelegate {
             e.printStackTrace();
         }
 
-        window = (PluginWindow) componentDocument.getWindow();
-        window.setDelegate(this);
+        window = componentDocument.getWindow();
         registerKeybindings();
 
         register();
@@ -123,13 +120,12 @@ public class PIEditor implements FileEditor, PluginContainerDelegate {
     private void registerKeyBinding(KeyStroke ks, final String action) {
         AnAction a = new AnAction() {
             public void actionPerformed(AnActionEvent event) {
-                ((ComponentEditorGrammar)componentDocument.getEditor()).getTextPane().getActionMap().get(action).actionPerformed(null);
+                componentDocument.getWindow().getTextEditor().getTextPane().getActionMap().get(action).actionPerformed(null);
             }
         };
 
         final String uniqueAction = action+this;
-        a.registerCustomShortcutSet(new CustomShortcutSet(ks),
-                ((ComponentEditorGrammar)componentDocument.getEditor()).getTextPane());
+        a.registerCustomShortcutSet(new CustomShortcutSet(ks), componentDocument.getWindow().getTextEditor().getTextPane());
         ActionManager.getInstance().registerAction(uniqueAction, a);
     }
 
@@ -234,7 +230,8 @@ public class PIEditor implements FileEditor, PluginContainerDelegate {
     }
 
     public JComponent getPreferredFocusedComponent() {
-        return window.getComponentContainer().getSelectedEditor().getTextEditor();
+        //return window.getComponentContainer().getSelectedEditor().getTextEditor();
+        return null;
     }
 
     @NotNull
@@ -263,11 +260,11 @@ public class PIEditor implements FileEditor, PluginContainerDelegate {
     }
 
     public void selectNotify() {
-        window.activate();
+        window.componentActivated();
     }
 
     public void deselectNotify() {
-        window.deactivate();
+        window.windowDeactivated();
         save();
     }
 

@@ -4,7 +4,7 @@ import com.intellij.ide.structureView.StructureView;
 import com.intellij.ide.structureView.StructureViewBuilder;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.project.Project;
-import org.antlr.works.plugin.container.PluginWindow;
+import org.antlr.works.components.GrammarWindow;
 /*
 
 [The "BSD licence"]
@@ -38,9 +38,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 public class PIStructureViewBuilder implements StructureViewBuilder {
 
-    public PluginWindow window;
+    public GrammarWindow window;
 
-    public PIStructureViewBuilder(PluginWindow window) {
+    public PIStructureViewBuilder(GrammarWindow window) {
         this.window = window;
     }
 

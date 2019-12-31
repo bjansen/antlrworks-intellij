@@ -1,10 +1,18 @@
 package org.antlr.works.plugin.intellij;
 
-import com.intellij.ide.structureView.StructureView;
-import com.intellij.ide.structureView.StructureViewModel;
+import com.intellij.icons.AllIcons;
+import com.intellij.ide.projectView.PresentationData;
+import com.intellij.ide.structureView.*;
+import com.intellij.ide.util.treeView.smartTree.Filter;
+import com.intellij.ide.util.treeView.smartTree.Grouper;
+import com.intellij.ide.util.treeView.smartTree.Sorter;
+import com.intellij.ide.util.treeView.smartTree.TreeElement;
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.project.Project;
-import org.antlr.works.plugin.container.PluginWindow;
+import org.antlr.works.components.GrammarWindow;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 /*
@@ -41,9 +49,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 public class PIStructureView implements StructureView {
 
     public FileEditor fileEditor;
-    public PluginWindow window;
+    public GrammarWindow window;
 
-    public PIStructureView(FileEditor fileEditor, Project project, PluginWindow window) {
+    public PIStructureView(FileEditor fileEditor, Project project, GrammarWindow window) {
         this.fileEditor = fileEditor;
         this.window = window;
     }
@@ -57,7 +65,7 @@ public class PIStructureView implements StructureView {
     }
 
     public JComponent getComponent() {
-        return window.getComponentContainer().getRulesComponent();
+        return window.getEditorRules().getComponent();
     }
 
     public void dispose() {
@@ -74,6 +82,98 @@ public class PIStructureView implements StructureView {
 
     // needed for IntelliJ 8.x
     public StructureViewModel getTreeModel() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return new StructureViewModel() {
+            @Nullable
+            @Override
+            public Object getCurrentEditorElement() {
+                return null;
+            }
+
+            @Override
+            public void addEditorPositionListener(@NotNull FileEditorPositionListener listener) {
+
+            }
+
+            @Override
+            public void removeEditorPositionListener(@NotNull FileEditorPositionListener listener) {
+
+            }
+
+            @Override
+            public void addModelListener(@NotNull ModelListener modelListener) {
+
+            }
+
+            @Override
+            public void removeModelListener(@NotNull ModelListener modelListener) {
+
+            }
+
+            @NotNull
+            @Override
+            public StructureViewTreeElement getRoot() {
+                return new StructureViewTreeElement() {
+                    @Override
+                    public Object getValue() {
+                        return null;
+                    }
+
+                    @NotNull
+                    @Override
+                    public ItemPresentation getPresentation() {
+                        return new PresentationData("", "", AllIcons.Diff.ApplyNotConflicts, null);
+                    }
+
+                    @NotNull
+                    @Override
+                    public TreeElement[] getChildren() {
+                        return new TreeElement[0];
+                    }
+
+                    @Override
+                    public void navigate(boolean requestFocus) {
+
+                    }
+
+                    @Override
+                    public boolean canNavigate() {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean canNavigateToSource() {
+                        return false;
+                    }
+                };
+            }
+
+            @NotNull
+            @Override
+            public Grouper[] getGroupers() {
+                return new Grouper[0];
+            }
+
+            @NotNull
+            @Override
+            public Sorter[] getSorters() {
+                return new Sorter[0];
+            }
+
+            @NotNull
+            @Override
+            public Filter[] getFilters() {
+                return new Filter[0];
+            }
+
+            @Override
+            public void dispose() {
+
+            }
+
+            @Override
+            public boolean shouldEnterElement(Object element) {
+                return false;
+            }
+        };
     }
 }
